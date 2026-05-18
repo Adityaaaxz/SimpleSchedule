@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Briefcase, User, AlertCircle } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 
 const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
   const [title, setTitle] = useState('');
@@ -9,8 +9,8 @@ const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title || !time) return;
-    onAdd({ title, time, category, completed: false, id: Date.now() });
+    if (!title.trim() || !time) return;
+    onAdd({ title: title.trim(), time, category, completed: false, id: Date.now() });
     setTitle('');
     setTime('');
     onClose();
@@ -19,70 +19,97 @@ const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(0, 0, 0, 0.6)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-        }}>
+        <>
+          {/* Backdrop */}
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="glass-panel"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
             style={{
-              width: '450px',
+              position: 'fixed', inset: 0,
+              background: 'rgba(0, 0, 0, 0.65)',
+              backdropFilter: 'blur(6px)',
+              zIndex: 999,
+            }}
+          />
+
+          {/* Modal */}
+          <motion.div
+            initial={{ scale: 0.96, opacity: 0, y: 10 }}
+            animate={{ scale: 1,    opacity: 1, y: 0  }}
+            exit={{   scale: 0.96, opacity: 0, y: 10 }}
+            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            style={{
+              position: 'fixed',
+              top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 1000,
+              width: '440px',
+              background: 'var(--bg-sidebar)',
+              border: '1px solid var(--border-hover)',
+              borderRadius: 'var(--r-xl)',
               padding: '32px',
-              position: 'relative',
-              background: 'rgba(15, 20, 28, 0.95)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
             }}
           >
-            <button 
-              onClick={onClose}
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', color: 'var(--text-muted)' }}
-            >
-              <X size={24} />
-            </button>
-
-            <h2 style={{ fontSize: '1.75rem', marginBottom: '24px' }}>New Schedule</h2>
-
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Task Title</label>
-                <input 
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '2px' }}>Add New Task</h2>
+                <p style={{ color: 'var(--text-3)', fontSize: '0.8rem' }}>Fill in the details below</p>
+              </div>
+              <button
+                onClick={onClose}
+                style={{
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-sm)',
+                  padding: '6px',
+                  color: 'var(--text-2)',
+                  lineHeight: 0,
+                }}
+              >
+                <X size={16} strokeWidth={2} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              {/* Title */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-2)', marginBottom: '8px' }}>
+                  Task Title
+                </label>
+                <input
                   autoFocus
-                  className="input-field" 
-                  placeholder="e.g. Design Sync"
+                  className="input-field"
+                  placeholder="e.g. Design Review"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={e => setTitle(e.target.value)}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              {/* Time + Category */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Time</label>
-                  <input 
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-2)', marginBottom: '8px' }}>
+                    Time
+                  </label>
+                  <input
                     type="time"
-                    className="input-field" 
+                    className="input-field"
                     value={time}
-                    onChange={(e) => setTime(e.target.value)}
+                    onChange={e => setTime(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Category</label>
-                  <select 
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-2)', marginBottom: '8px' }}>
+                    Category
+                  </label>
+                  <select
                     className="input-field"
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    style={{ appearance: 'none' }}
+                    onChange={e => setCategory(e.target.value)}
+                    style={{ appearance: 'none', cursor: 'pointer' }}
                   >
                     <option value="Work">Work</option>
                     <option value="Personal">Personal</option>
@@ -91,14 +118,38 @@ const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
                 </div>
               </div>
 
-              <div style={{ marginTop: '12px' }}>
-                <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '16px' }}>
-                  Create Schedule
+              {/* Divider */}
+              <div className="divider" />
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  style={{
+                    flex: 1,
+                    padding: '11px',
+                    borderRadius: 'var(--r-md)',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-2)',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  style={{ flex: 1, padding: '11px' }}
+                >
+                  Create Task
                 </button>
               </div>
             </form>
           </motion.div>
-        </div>
+        </>
       )}
     </AnimatePresence>
   );

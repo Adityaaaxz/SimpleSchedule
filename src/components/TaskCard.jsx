@@ -1,44 +1,55 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trash2, CheckCircle, Circle, Clock } from 'lucide-react';
+import { Trash2, CheckCircle2, Circle, Clock } from 'lucide-react';
 
 const TaskCard = ({ task, onToggle, onDelete }) => {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className="glass-card"
+      exit={{ opacity: 0, scale: 0.97 }}
+      transition={{ duration: 0.2 }}
+      className="card"
       style={{
-        padding: '20px',
+        padding: '16px 20px',
         display: 'flex',
         alignItems: 'center',
-        gap: '20px',
-        marginBottom: '16px',
-        opacity: task.completed ? 0.7 : 1,
+        gap: '16px',
+        marginBottom: '10px',
+        opacity: task.completed ? 0.55 : 1,
       }}
     >
-      <button 
+      {/* Check */}
+      <button
         onClick={() => onToggle(task.id)}
-        style={{ background: 'transparent', color: task.completed ? 'var(--success)' : 'var(--text-muted)' }}
+        style={{ background: 'transparent', flexShrink: 0, padding: '2px', lineHeight: 0 }}
       >
-        {task.completed ? <CheckCircle size={24} /> : <Circle size={24} />}
+        {task.completed
+          ? <CheckCircle2 size={20} color="var(--success)" strokeWidth={2} />
+          : <Circle       size={20} color="var(--text-3)"  strokeWidth={1.75} />
+        }
       </button>
 
-      <div style={{ flex: 1 }}>
-        <h3 style={{ 
-          fontSize: '1.1rem', 
+      {/* Info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{
+          fontSize: '0.9rem',
+          fontWeight: 500,
           marginBottom: '4px',
           textDecoration: task.completed ? 'line-through' : 'none',
-          color: task.completed ? 'var(--text-muted)' : 'var(--text-primary)'
+          color: task.completed ? 'var(--text-3)' : 'var(--text-1)',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         }}>
           {task.title}
-        </h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            <Clock size={14} />
-            <span>{task.time}</span>
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '5px',
+            color: 'var(--text-3)', fontSize: '0.775rem'
+          }}>
+            <Clock size={12} strokeWidth={1.75} />
+            {task.time}
           </div>
           <span className={`badge badge-${task.category.toLowerCase()}`}>
             {task.category}
@@ -46,16 +57,21 @@ const TaskCard = ({ task, onToggle, onDelete }) => {
         </div>
       </div>
 
-      <button 
+      {/* Delete */}
+      <button
         onClick={() => onDelete(task.id)}
-        style={{ 
-          background: 'rgba(239, 68, 68, 0.1)', 
-          color: 'var(--danger)', 
-          padding: '8px', 
-          borderRadius: '10px' 
+        style={{
+          background: 'transparent',
+          color: 'var(--text-3)',
+          padding: '6px',
+          borderRadius: 'var(--r-sm)',
+          lineHeight: 0,
+          flexShrink: 0,
         }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'var(--danger-dim)'; e.currentTarget.style.color = 'var(--danger)'; }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-3)'; }}
       >
-        <Trash2 size={18} />
+        <Trash2 size={16} strokeWidth={1.75} />
       </button>
     </motion.div>
   );
